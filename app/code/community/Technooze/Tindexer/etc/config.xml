@@ -22,8 +22,37 @@
         <models>
             <tindexer>
                 <class>Technooze_Tindexer_Model</class>
+                <resourceModel>tindexer_mysql4</resourceModel>
             </tindexer>
+            <tindexer_mysql4>
+                <class>Technooze_Tindexer_Model_Mysql4</class>
+                <entities>
+                    <products>
+                        <table>tindexer</table>
+                    </products>
+                </entities>
+            </tindexer_mysql4>
         </models>
+        <resources>
+            <tindexer_setup>
+                <setup>
+                    <module>Technooze_Tindexer</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </tindexer_setup>
+            <tindexer_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </tindexer_write>
+            <tindexer_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </tindexer_read>
+        </resources>
         <index>
             <indexer>
                 <tindexer_indexer>
