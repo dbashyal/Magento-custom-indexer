@@ -185,10 +185,15 @@ class Technooze_Tindexer_Model_Products extends Mage_Core_Model_Abstract
                             ->addAttributeToFilter($filter,$optionId)
                             ->addStoreFilter()
                             ;
+
+        // ---
+        $includedCategories = $includedProducts = array();
         if($collection->count()){
             foreach($collection as $v){
                 $cats = $this->getProductCategories($v);
+                $includedProducts[] = $v->getId();
                 foreach($cats as $cat){
+                    $includedCategories[] = $cat;
                     if(isset($this->_filteredProducts[$optionId][$cat])){
                         $this->_filteredProducts[$optionId][$cat]++;
                         continue;
@@ -205,18 +210,18 @@ class Technooze_Tindexer_Model_Products extends Mage_Core_Model_Abstract
                 $data = array(
                     'attr_id' => $optionId,
                     'count' => $counts,
+                    'products' => ','.implode(',', $includedProducts).',',
+                    'categories' => ','.implode(',', $includedCategories).',',
                     'flag' => 0,
                     'store_id' => 0,
                 );
                 $model->addData($data);
                 $model->save();
-                Mage::log('save');
             } catch (Exception $e) {
                 Mage::log($e->getMessage());
                 return;
             }
         } else {
-            Mage::log('nill');
         }
         return;
     }

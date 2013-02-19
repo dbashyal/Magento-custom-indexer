@@ -33,6 +33,8 @@ class Technooze_Tindexer_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     // var to protect multiple runs
     protected $_registered = false;
     protected $_processed = false;
+    protected $_categoryId = 0;
+    protected $_productIds = array();
 
     /**
      * not sure why this is required.
@@ -94,6 +96,9 @@ class Technooze_Tindexer_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
         
         if ($eventType == Mage_Index_Model_Event::TYPE_SAVE || $eventType == Mage_Index_Model_Event::TYPE_MASS_ACTION) {
             $process = $event->getProcess();
+            $this->_productIds = $event->getDataObject()->getData('product_ids');
+            $this->flagIndexRequired($this->_productIds, 'products');
+
             $process->changeStatus(Mage_Index_Model_Process::STATUS_REQUIRE_REINDEX);
         }
     }
@@ -113,6 +118,9 @@ class Technooze_Tindexer_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
         
         if ($category->getIsChangedProductList() || $category->getAffectedCategoryIds()) {
             $process = $event->getProcess();
+            $this->_categoryId = $event->getDataObject()->getData('entity_id');
+            $this->flagIndexRequired($this->_categoryId, 'categories');
+
             $process->changeStatus(Mage_Index_Model_Process::STATUS_REQUIRE_REINDEX);
         }
     }
@@ -123,9 +131,21 @@ class Technooze_Tindexer_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
         }
     }
 
-    public function reindexAll(){
-        // reindex all data | initFilteredProductsCount
+    public function flagIndexRequired($ids=array(), $type='products'){
+        $ids = (array)$ids;
         $collection = Mage::getModel('tindexer/products')->getCollection();
+        $filter = array();
+        foreach($ids as $id){
+            $filter[] = array('like' => "%,{$id},%");
+        }
+        $collection->addFieldToFilter($type, $filter);
+        $collection->setDataToAll('flag', 1);
+        $collection->save();
+    }
+
+    public function reindexAll(){
+        // reindex all data which are flagged 1 | initFilteredProductsCount
+        $collection = Mage::getModel('tindexer/products')->getCollection()->addFieldToFilter('flag', 1);
         foreach($collection as $v){
             try{
                 Mage::getModel('tindexer/products')->initFilteredProductsCount('brand', $v->getData('attr_id'), $v->getData('tindexer_id'));

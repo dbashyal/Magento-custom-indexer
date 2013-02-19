@@ -25,6 +25,8 @@ CREATE TABLE {$this->getTable('tindexer')} (
    `tindexer_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
    `attr_id` int(10) DEFAULT NULL,
    `count` text,
+   `categories` text,
+   `products` text,
    `store_id` int(11) NOT NULL DEFAULT '1',
    `flag` int(1) NOT NULL DEFAULT '0',
    `update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
