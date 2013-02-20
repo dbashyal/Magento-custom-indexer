@@ -172,7 +172,9 @@ class Technooze_Tindexer_Model_Products extends Mage_Core_Model_Abstract
 
         // if we find data from db and it's not an update
         // then no further processing is required
-        if(!empty($products) && !$id){
+        $isEnabled = Mage::getStoreConfig('tgeneral/general/tindexer');
+        Mage::log('enabled - ' . $isEnabled);
+        if(!empty($products) && !$id && $isEnabled ){
             $optionId = $products[0]['attr_id'];
             $data = unserialize($products[0]['count']);
             $this->_filteredProducts = $data;
